@@ -1,13 +1,14 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/big_event
+    url: jdbc:mysql://192.168.1.10:3306/big_event?useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: 123456
+    password: Aa@123456
   data:
     redis:
-      host: 192.168.1.98
+      host: 192.168.1.10
       port: 6379
+      password: armbian@2025
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
