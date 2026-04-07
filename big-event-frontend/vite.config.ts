@@ -18,5 +18,20 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api/,'')
       }
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/element-plus') || id.includes('node_modules/@element-plus')) {
+            return 'element-plus'
+          }
+          if (id.includes('node_modules/@vueup/vue-quill') || id.includes('node_modules/quill')) {
+            return 'quill'
+          }
+        }
+      }
+    }
   }
 })
