@@ -2,19 +2,11 @@ import request from '@/utils/request'
 import type { LoginRequest, RegisterRequest, User, UpdatePasswordRequest, Result } from '@/types'
 
 export const userRegisterService = (registerData: RegisterRequest): Promise<Result> => {
-  const params = new URLSearchParams()
-  for (const key in registerData) {
-    params.append(key, registerData[key] as string)
-  }
-  return request.post('/user/register', params)
+  return request.post('/user/register', registerData)
 }
 
 export const userLoginService = (loginData: LoginRequest): Promise<Result<string>> => {
-  const params = new URLSearchParams()
-  for (const key in loginData) {
-    params.append(key, loginData[key] as string)
-  }
-  return request.post('/user/login', params)
+  return request.post('/user/login', loginData)
 }
 
 export const userInfoService = (): Promise<Result<User>> => {

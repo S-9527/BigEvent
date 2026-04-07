@@ -2,8 +2,11 @@ package com.itheima.bigevent.controller;
 
 import com.itheima.bigevent.pojo.Result;
 import com.itheima.bigevent.pojo.User;
+import com.itheima.bigevent.pojo.dto.LoginRequest;
+import com.itheima.bigevent.pojo.dto.RegisterRequest;
 import com.itheima.bigevent.security.JwtUtil;
 import com.itheima.bigevent.service.UserService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +50,10 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public Result<User> register(@Pattern(regexp = "^\\S{5,16}$") final String username, 
-                                  @Pattern(regexp = "^\\S{5,16}$") final String password) {
-        final User existingUser = userService.findByUsername(username);
+    public Result<User> register(@RequestBody @Valid final RegisterRequest registerRequest) {
+        final User existingUser = userService.findByUsername(registerRequest.getUsername());
         if (existingUser == null) {
-            userService.register(username, password);
+            userService.register(registerRequest.getUsername(), registerRequest.getPassword());
             return Result.success();
         } else {
             return Result.error("用户名已被占用");
@@ -59,22 +61,21 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public Result<String> login(@Pattern(regexp = "^\\S{5,16}$") final String username, 
-                                 @Pattern(regexp = "^\\S{5,16}$") final String password) {
+    public Result<String> login(@RequestBody @Valid final LoginRequest loginRequest) {
         try {
             // 使用 Spring Security 进行认证
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
-            
+
             // 认证成功后生成 Token
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String token = JwtUtil.generateToken(userDetails);
-            
+
             // 保存 token 到 Redis
             final ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
             operations.set(token, token, Duration.ofHours(12));
-            
+
             return Result.success(token);
         } catch (Exception e) {
             return Result.error("用户名或密码错误");
