@@ -15,7 +15,6 @@ import { useUserInfoStore } from '@/stores/userInfo'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useTokenStore } from '@/stores/token'
-import type { Command } from 'element-plus'
 
 const userInfoStore = useUserInfoStore()
 
@@ -29,7 +28,7 @@ getUserInfo()
 const router = useRouter()
 const tokenStore = useTokenStore()
 
-const handleCommand = async (command: Command) => {
+const handleCommand = async (command: string) => {
   if (command === 'logout') {
     ElMessageBox.confirm(
       '你确认要退出吗？',
@@ -71,7 +70,7 @@ const handleCommand = async (command: Command) => {
           </el-icon>
           <span>文章管理</span>
         </el-menu-item>
-        <el-sub-menu>
+        <el-sub-menu index="/user">
           <template #title>
             <el-icon>
               <UserFilled/>

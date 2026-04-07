@@ -31,22 +31,18 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to, _from) => {
   const tokenStore = useTokenStore()
 
   // 如果访问登录页且已有 token，直接跳转到首页
   if (to.path === '/login' && tokenStore.token) {
-    next('/')
-    return
+    return '/'
   }
 
   // 如果访问需要认证的页面且没有 token，跳转到登录页
   if (to.path !== '/login' && !tokenStore.token) {
-    next('/login')
-    return
+    return '/login'
   }
-
-  next()
 })
 
 export default router
