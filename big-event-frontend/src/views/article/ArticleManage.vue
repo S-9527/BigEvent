@@ -1,7 +1,8 @@
-<script setup>
-import {Delete, Edit, Plus} from '@element-plus/icons-vue'
+<script setup lang="ts">
+import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 
-import {ref} from 'vue'
+import { ref } from 'vue'
+import type { UploadResult } from 'element-plus'
 import {
   articleAddService,
   articleCategoryListService,
@@ -9,75 +10,42 @@ import {
   articleListService,
   articleUpdateService
 } from "@/api/article";
-import {QuillEditor} from '@vueup/vue-quill'
+import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import {useTokenStore} from "@/stores/token";
-import {ElMessage, ElMessageBox} from "element-plus";
+import { useTokenStore } from "@/stores/token";
+import { ElMessage, ElMessageBox } from "element-plus";
+
+interface Category {
+  id: number;
+  categoryName: string;
+  categoryAlias: string;
+  createTime: string;
+  updateTime: string;
+}
+
+interface Article {
+  id?: number;
+  title: string;
+  content: string;
+  coverImg: string;
+  state: string;
+  categoryId: number | string;
+  createTime?: string;
+  updateTime?: string;
+  categoryName?: string;
+}
 
 //文章分类数据模型
-const categories = ref([
-  {
-    "id": 3,
-    "categoryName": "美食",
-    "categoryAlias": "my",
-    "createTime": "2023-09-02 12:06:59",
-    "updateTime": "2023-09-02 12:06:59"
-  },
-  {
-    "id": 4,
-    "categoryName": "娱乐",
-    "categoryAlias": "yl",
-    "createTime": "2023-09-02 12:08:16",
-    "updateTime": "2023-09-02 12:08:16"
-  },
-  {
-    "id": 5,
-    "categoryName": "军事",
-    "categoryAlias": "js",
-    "createTime": "2023-09-02 12:08:33",
-    "updateTime": "2023-09-02 12:08:33"
-  }
-])
+const categories = ref<Category[]>([])
 
 //用户搜索时选中的分类id
-const categoryId = ref('')
+const categoryId = ref<number | string>('')
 
 //用户搜索时选中的发布状态
-const state = ref('')
+const state = ref<string>('')
 
 //文章列表数据模型
-const articles = ref([
-  // {
-  //   "id": 5,
-  //   "title": "陕西旅游攻略",
-  //   "content": "兵马俑,华清池,法门寺,华山...爱去哪去哪...",
-  //   "coverImg": "https://big-event-gwd.oss-cn-beijing.aliyuncs.com/9bf1cf5b-1420-4c1b-91ad-e0f4631cbed4.png",
-  //   "state": "草稿",
-  //   "categoryId": 2,
-  //   "createTime": "2023-09-03 11:55:30",
-  //   "updateTime": "2023-09-03 11:55:30"
-  // },
-  // {
-  //   "id": 5,
-  //   "title": "陕西旅游攻略",
-  //   "content": "兵马俑,华清池,法门寺,华山...爱去哪去哪...",
-  //   "coverImg": "https://big-event-gwd.oss-cn-beijing.aliyuncs.com/9bf1cf5b-1420-4c1b-91ad-e0f4631cbed4.png",
-  //   "state": "草稿",
-  //   "categoryId": 2,
-  //   "createTime": "2023-09-03 11:55:30",
-  //   "updateTime": "2023-09-03 11:55:30"
-  // },
-  // {
-  //   "id": 5,
-  //   "title": "陕西旅游攻略",
-  //   "content": "兵马俑,华清池,法门寺,华山...爱去哪去哪...",
-  //   "coverImg": "https://big-event-gwd.oss-cn-beijing.aliyuncs.com/9bf1cf5b-1420-4c1b-91ad-e0f4631cbed4.png",
-  //   "state": "草稿",
-  //   "categoryId": 2,
-  //   "createTime": "2023-09-03 11:55:30",
-  //   "updateTime": "2023-09-03 11:55:30"
-  // },
-])
+const articles = ref<Article[]>([])
 
 //分页条数据模型
 const pageNum = ref(1)//当前页
@@ -85,12 +53,12 @@ const total = ref(20)//总条数
 const pageSize = ref(3)//每页条数
 
 //当每页条数发生了变化，调用此函数
-const onSizeChange = (size) => {
+const onSizeChange = (size: number) => {
   pageSize.value = size
   articleList()
 }
 //当前页码发生变化，调用此函数
-const onCurrentChange = (num) => {
+const onCurrentChange = (num: number) => {
   pageNum.value = num
   articleList()
 }
@@ -126,9 +94,9 @@ articleList()
 
 //控制抽屉是否显示
 const visibleDrawer = ref(false)
-const drawerTitle = ref('')
+const drawerTitle = ref<string>('')
 //添加表单数据模型
-const articleModel = ref({
+const articleModel = ref<Article>({
   title: '',
   categoryId: '',
   coverImg: '',
@@ -137,11 +105,11 @@ const articleModel = ref({
 })
 
 const tokenStore = useTokenStore();
-const uploadSuccess = (result) => {
+const uploadSuccess = (result: UploadResult) => {
   articleModel.value.coverImg = result.data
 }
 
-const addArticle = async (clickState) => {
+const addArticle = async (clickState: string) => {
   articleModel.value.state = clickState
   await articleAddService(articleModel.value);
   ElMessage.success('添加成功')
@@ -151,7 +119,7 @@ const addArticle = async (clickState) => {
 
 
 // 修改与删除
-const showEditDialog = (row, title) => {
+const showEditDialog = (row: Article, title: string) => {
   visibleDrawer.value = true
   drawerTitle.value = title
   articleModel.value = {
@@ -159,7 +127,7 @@ const showEditDialog = (row, title) => {
   }
 }
 
-const showAddDialog = (title) => {
+const showAddDialog = (title: string) => {
   clearData()
   drawerTitle.value = title
   visibleDrawer.value = true
@@ -174,7 +142,7 @@ const clearData = () => {
   }
 }
 
-const updateArticle = async (clickState) => {
+const updateArticle = async (clickState: string) => {
   articleModel.value.state = clickState
   await articleUpdateService(articleModel.value);
   ElMessage.success("添加成功")
@@ -183,7 +151,7 @@ const updateArticle = async (clickState) => {
 }
 
 
-const deleteArticle = (row) => {
+const deleteArticle = (row: Article) => {
   ElMessageBox.confirm(
       '你确认要删除该文章信息吗？',
       '温馨提示',

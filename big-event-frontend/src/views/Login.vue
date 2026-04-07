@@ -1,22 +1,23 @@
-<script setup>
-
-import {Lock, User} from "@element-plus/icons-vue"
-import {ref} from "vue";
-import {userLoginService, userRegisterService} from "@/api/user";
-import {ElMessage} from "element-plus";
-import {useRouter} from "vue-router";
-import {useTokenStore} from "@/stores/token";
+<script setup lang="ts">
+import { Lock, User } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
+import { userLoginService, userRegisterService } from '@/api/user'
+import type { LoginRequest, RegisterRequest } from '@/types'
+import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+import { useTokenStore } from '@/stores/token'
 
 // Register page and Login page use the same view.
 // By default, show login.
-const isRegister = ref(false);
-const registerData = ref({
+const isRegister = ref(false)
+const registerData = ref<RegisterRequest>({
   username: '',
   password: '',
   rePassword: ''
-});
+})
 
-const checkRePassword = (rule, value, callback) => {
+const checkRePassword = (_rule: any, value: string, callback: any) => {
   if (value === '') {
     callback(new Error('请再次确认密码'))
   } else if (value !== registerData.value.password) {
@@ -25,38 +26,43 @@ const checkRePassword = (rule, value, callback) => {
     callback()
   }
 }
-const rules = {
+
+const rules = ref<FormRules>({
   username: [
-    {required: true, message: '请输入用户名', trigger: 'blur'},
-    {min: 5, max: 16, message: '长度为5-16位', trigger: 'blur'},
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 5, max: 16, message: '长度为5-16位', trigger: 'blur' },
   ],
   password: [
-    {required: true, message: '请输入密码', trigger: 'blur'},
-    {min: 5, max: 16, message: '长度为5-16位', trigger: 'blur'},
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 5, max: 16, message: '长度为5-16位', trigger: 'blur' },
   ],
   rePassword: [
-    {required: true, message: '请输入密码', trigger: 'blur'},
-    {validator: checkRePassword, trigger: 'blur'},
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { validator: checkRePassword, trigger: 'blur' },
   ]
-}
+})
 
 const register = async () => {
-  const valid = await form.value.validate();
+  const valid = await form.value?.validate().catch(() => false)
   if (valid) {
-    const result = await userRegisterService(registerData.value);
-    ElMessage.success(result.message ? result.message : '注册成功')
+    const result = await userRegisterService(registerData.value)
+    ElMessage.success(result.message || '注册成功')
   }
 }
 
 const router = useRouter()
-const tokenStore = useTokenStore();
-const form = ref(null)
+const tokenStore = useTokenStore()
+const form = ref<FormInstance | null>(null)
+
 const login = async () => {
-  // HM
-  const valid = await form.value.validate();
+  const valid = await form.value?.validate().catch(() => false)
   if (valid) {
-    const result = await userLoginService(registerData.value);
-    ElMessage.success(result.message ? result.message : '登录成功')
+    const loginData: LoginRequest = {
+      username: registerData.value.username,
+      password: registerData.value.password
+    }
+    const result = await userLoginService(loginData)
+    ElMessage.success(result.message || '登录成功')
 
     tokenStore.setToken(result.data)
     router.push('/')
@@ -70,8 +76,6 @@ const clearRegisterData = () => {
     rePassword: ''
   }
 }
-
-
 </script>
 
 <template>
@@ -101,7 +105,7 @@ const clearRegisterData = () => {
           </el-button>
         </el-form-item>
         <el-form-item class="flex">
-          <el-link type="info" :underline="false" @click="isRegister = false;clearRegisterData()">
+          <el-link type="info" :underline="false" @click="isRegister = false; clearRegisterData()">
             ← 返回
           </el-link>
         </el-form-item>
@@ -132,7 +136,7 @@ const clearRegisterData = () => {
           </el-button>
         </el-form-item>
         <el-form-item class="flex">
-          <el-link type="info" :underline="false" @click="isRegister = true;clearRegisterData()">
+          <el-link type="info" :underline="false" @click="isRegister = true; clearRegisterData()">
             注册 →
           </el-link>
         </el-form-item>

@@ -1,10 +1,16 @@
-<script setup>
-import {ref} from 'vue'
-import {userPwdUpdateService} from "@/api/user";
-import {ElMessage} from "element-plus";
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { FormRules, FormItemRule } from 'element-plus'
+import { userPwdUpdateService } from "@/api/user";
+import { ElMessage } from "element-plus";
 
+interface PwdData {
+  old_pwd: string;
+  new_pwd: string;
+  re_pwd: string;
+}
 
-const pwdData = ref({
+const pwdData = ref<PwdData>({
   old_pwd: '',
   new_pwd: '',
   re_pwd: ''
@@ -19,7 +25,8 @@ const updatePwdData = async () => {
     re_pwd: ''
   }
 }
-const checkRePassword = (rule, value, callback) => {
+
+const checkRePassword: FormItemRule['validator'] = (rule, value, callback) => {
   if (value === '') {
     callback(new Error('请再次确认密码'))
   } else if (value !== pwdData.value.new_pwd) {
@@ -28,20 +35,21 @@ const checkRePassword = (rule, value, callback) => {
     callback()
   }
 }
-const rules = {
+
+const rules = ref<FormRules>({
   old_pwd: [
-    {required: true, message: '请输入旧密码?', trigger: 'blur'},
-    {min: 5, max: 16, message: '长度为5-16位', trigger: 'blur'},
+    { required: true, message: '请输入旧密码?', trigger: 'blur' },
+    { min: 5, max: 16, message: '长度为5-16位', trigger: 'blur' },
   ],
   new_pwd: [
-    {required: true, message: '请输入新密码', trigger: 'blur'},
-    {min: 5, max: 16, message: '长度为5-16位', trigger: 'blur'},
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    { min: 5, max: 16, message: '长度为5-16位', trigger: 'blur' },
   ],
   re_pwd: [
-    {required: true, message: '请输入确认新密码', trigger: 'blur'},
-    {validator: checkRePassword, trigger: 'blur'},
+    { required: true, message: '请输入确认新密码', trigger: 'blur' },
+    { validator: checkRePassword, trigger: 'blur' },
   ]
-}
+})
 </script>
 
 <template>

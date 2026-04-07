@@ -1,5 +1,4 @@
-<script setup>
-
+<script setup lang="ts">
 import {
   CaretBottom,
   Crop,
@@ -11,40 +10,42 @@ import {
   UserFilled
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
-import {userInfoService} from "@/api/user";
-import {useUserInfoStore} from "@/stores/userInfo";
-import {useRouter} from "vue-router";
-import {ElMessage, ElMessageBox} from "element-plus";
-import {useTokenStore} from "@/stores/token";
+import { userInfoService } from '@/api/user'
+import { useUserInfoStore } from '@/stores/userInfo'
+import { useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useTokenStore } from '@/stores/token'
+import type { Command } from 'element-plus'
 
-const userInfoStore = useUserInfoStore();
+const userInfoStore = useUserInfoStore()
+
 const getUserInfo = async () => {
-  const result = await userInfoService();
+  const result = await userInfoService()
   userInfoStore.setUserInfo(result.data)
 }
+
 getUserInfo()
 
-const router = useRouter();
-const tokenStore = useTokenStore();
-const handleCommand = (command) => {
+const router = useRouter()
+const tokenStore = useTokenStore()
+
+const handleCommand = async (command: Command) => {
   if (command === 'logout') {
     ElMessageBox.confirm(
-        '你确认要退出吗？',
-        '温馨提示',
-        {
-          confirmButtonText: '确认',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-    ).then(
-        async () => {
-          // clear data in pinia
-          userInfoStore.removeUserInfo()
-          tokenStore.removeToken()
-          ElMessage.success("退出成功")
-          await router.push('/login')
-        }
-    )
+      '你确认要退出吗？',
+      '温馨提示',
+      {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    ).then(async () => {
+      // clear data in pinia
+      userInfoStore.removeUserInfo()
+      tokenStore.removeToken()
+      ElMessage.success('退出成功')
+      await router.push('/login')
+    })
   } else {
     router.push('/user/' + command)
   }

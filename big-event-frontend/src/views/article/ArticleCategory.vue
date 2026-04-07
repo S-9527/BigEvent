@@ -1,38 +1,24 @@
-<script setup>
-import {Delete, Edit} from '@element-plus/icons-vue'
-import {ref} from 'vue'
+<script setup lang="ts">
+import { Delete, Edit } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
 import {
   articleCategoryAddService,
   articleCategoryDeleteService,
   articleCategoryListService,
   articleCategoryUpdateService
 } from "@/api/article";
-import {ElMessage, ElMessageBox} from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 
-const categories = ref([
-  // {
-  //   "id": 3,
-  //   "categoryName": "美食",
-  //   "categoryAlias": "my",
-  //   "createTime": "2023-09-02 12:06:59",
-  //   "updateTime": "2023-09-02 12:06:59"
-  // },
-  // {
-  //   "id": 4,
-  //   "categoryName": "娱乐",
-  //   "categoryAlias": "yl",
-  //   "createTime": "2023-09-02 12:08:16",
-  //   "updateTime": "2023-09-02 12:08:16"
-  // },
-  // {
-  //   "id": 5,
-  //   "categoryName": "军事",
-  //   "categoryAlias": "js",
-  //   "createTime": "2023-09-02 12:08:33",
-  //   "updateTime": "2023-09-02 12:08:33"
-  // }
-])
+interface Category {
+  id?: number;
+  categoryName: string;
+  categoryAlias: string;
+  createTime?: string;
+  updateTime?: string;
+}
 
+const categories = ref<Category[]>([])
 
 const articleCategoryList = async () => {
   const result = await articleCategoryListService();
@@ -45,24 +31,24 @@ articleCategoryList()
 const dialogVisible = ref(false)
 
 //添加分类数据模型
-const categoryModel = ref({
+const categoryModel = ref<Category>({
   categoryName: '',
   categoryAlias: ''
 })
 //添加分类表单校验
-const rules = {
+const rules = ref<FormRules>({
   categoryName: [
-    {required: true, message: '请输入分类名称', trigger: 'blur'},
+    { required: true, message: '请输入分类名称', trigger: 'blur' },
   ],
   categoryAlias: [
-    {required: true, message: '请输入分类别名', trigger: 'blur'},
+    { required: true, message: '请输入分类别名', trigger: 'blur' },
   ]
-}
-const title = ref('')
+})
+const title = ref<string>('')
 
-const form = ref(null)
+const form = ref<FormInstance>()
 const addCategory = async () => {
-  const valid = await form.value.validate();
+  const valid = await form.value?.validate();
   if (valid) {
     await articleCategoryAddService(categoryModel.value);
     ElMessage.success("添加成功")
@@ -72,7 +58,7 @@ const addCategory = async () => {
 }
 
 // Show Edit Dialog
-const showDialog = (row) => {
+const showDialog = (row: Category) => {
   dialogVisible.value = true
   title.value = '编辑分类'
   categoryModel.value = {
@@ -83,7 +69,7 @@ const showDialog = (row) => {
 }
 
 const updateCategory = async () => {
-  const valid = await form.value.validate();
+  const valid = await form.value?.validate();
   if (valid) {
     await articleCategoryUpdateService(categoryModel.value);
     ElMessage.success("添加成功")
@@ -99,7 +85,7 @@ const clearData = () => {
   }
 }
 
-const deleteCategory = (row) => {
+const deleteCategory = (row: Category) => {
   ElMessageBox.confirm(
       '你确认要删除该分类信息吗？',
       '温馨提示',

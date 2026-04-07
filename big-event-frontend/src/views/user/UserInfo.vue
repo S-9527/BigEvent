@@ -1,18 +1,28 @@
-<script setup>
-import {ref} from 'vue'
-import {useUserInfoStore} from "@/stores/userInfo";
-import {userInfoUpdateService} from "@/api/user";
-import {ElMessage} from "element-plus";
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { FormRules } from 'element-plus'
+import { useUserInfoStore } from "@/stores/userInfo";
+import { userInfoUpdateService } from "@/api/user";
+import { ElMessage } from "element-plus";
 
 const userInfoStore = useUserInfoStore();
 
+interface UserInfo {
+  id?: number;
+  username?: string;
+  nickname?: string;
+  email?: string;
+  userPic?: string;
+  [key: string]: unknown;
+}
 
-const userInfo = ref({
+const userInfo = ref<UserInfo>({
   ...userInfoStore.userInfo
 })
-const rules = {
+
+const rules = ref<FormRules>({
   nickname: [
-    {required: true, message: '请输入用户昵称', trigger: 'blur'},
+    { required: true, message: '请输入用户昵称', trigger: 'blur' },
     {
       pattern: /^\S{2,10}$/,
       message: '昵称必须是2-10位的非空字符串',
@@ -20,10 +30,10 @@ const rules = {
     }
   ],
   email: [
-    {required: true, message: '请输入用户邮箱', trigger: 'blur'},
-    {type: 'email', message: '邮箱格式不正确', trigger: 'blur'}
+    { required: true, message: '请输入用户邮箱', trigger: 'blur' },
+    { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
   ]
-}
+})
 
 const updateUserInfo = () => {
   userInfoUpdateService(userInfo.value);

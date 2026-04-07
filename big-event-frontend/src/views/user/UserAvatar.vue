@@ -1,20 +1,21 @@
-<script setup>
-import {Plus, Upload} from '@element-plus/icons-vue'
-import {ref} from 'vue'
-import {useUserInfoStore} from "@/stores/userInfo";
-import {useTokenStore} from "@/stores/token";
-import {ElMessage} from "element-plus";
-import {userAvatarUpdateService} from "@/api/user";
+<script setup lang="ts">
+import { Plus, Upload } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import type { UploadResult } from 'element-plus'
+import { useUserInfoStore } from "@/stores/userInfo";
+import { useTokenStore } from "@/stores/token";
+import { ElMessage } from "element-plus";
+import { userAvatarUpdateService } from "@/api/user";
 
-const uploadRef = ref()
+const uploadRef = ref<InstanceType<typeof import('element-plus')['ElUpload']>>()
 
 const userInfoStore = useUserInfoStore();
 
 //用户头像地址
-const imgUrl = ref(userInfoStore.userInfo.userPic)
+const imgUrl = ref<string>(userInfoStore.userInfo.userPic)
 
 const tokenStore = useTokenStore();
-const uploadSuccess = (result) => {
+const uploadSuccess = (result: UploadResult) => {
   imgUrl.value = result.data;
   ElMessage.success("图片上传成功")
 }
