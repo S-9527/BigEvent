@@ -6,6 +6,7 @@ import ArticleManage from "@/views/article/ArticleManage.vue";
 import UserInfo from "@/views/user/UserInfo.vue";
 import UserAvatar from "@/views/user/UserAvatar.vue";
 import UserResetPassword from "@/views/user/UserResetPassword.vue";
+import {useTokenStore} from "@/stores/token";
 
 const routes = [
   {path: '/login', component: Login},
@@ -27,5 +28,24 @@ const router = createRouter({
   history: createWebHistory(),
   routes: routes
 })
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  const tokenStore = useTokenStore();
+  
+  // 如果访问登录页且已有 token，直接跳转到首页
+  if (to.path === '/login' && tokenStore.token) {
+    next('/');
+    return;
+  }
+  
+  // 如果访问需要认证的页面且没有 token，跳转到登录页
+  if (to.path !== '/login' && !tokenStore.token) {
+    next('/login');
+    return;
+  }
+  
+  next();
+});
 
 export default router

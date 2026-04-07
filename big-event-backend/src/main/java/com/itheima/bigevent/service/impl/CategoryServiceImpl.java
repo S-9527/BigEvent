@@ -4,12 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.itheima.bigevent.mapper.CategoryMapper;
 import com.itheima.bigevent.pojo.Category;
 import com.itheima.bigevent.service.CategoryService;
-import com.itheima.bigevent.utils.ThreadLocalUtil;
+import com.itheima.bigevent.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -17,19 +18,24 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public void add(final Category category) {
-        // Add attributes
-        final Map<String, Object> map = ThreadLocalUtil.get();
-        final Integer id = (Integer) map.get("id");
-        category.setCreateUser(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        com.itheima.bigevent.pojo.User currentUser = userService.findByUsername(username);
+        category.setCreateUser(currentUser.getId());
         categoryMapper.insert(category);
     }
 
     @Override
     public List<Category> list() {
-        final Map<String, Object> map = ThreadLocalUtil.get();
-        final Integer id = (Integer) map.get("id");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        com.itheima.bigevent.pojo.User currentUser = userService.findByUsername(username);
+        final Integer id = currentUser.getId();
 
         LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Category::getCreateUser, id);

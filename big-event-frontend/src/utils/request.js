@@ -10,7 +10,8 @@ instance.interceptors.request.use(
     config => {
       const tokenStore = useTokenStore();
       if (tokenStore.token) {
-        config.headers.Authorization = tokenStore.token
+        // 添加 Bearer 前缀以适配 Spring Security
+        config.headers.Authorization = `Bearer ${tokenStore.token}`
       }
       return config
     },
@@ -29,10 +30,14 @@ instance.interceptors.response.use(
 
     },
     error => {
+      // 处理 Spring Security 的认证失败
       if (error.response.status === 401) {
-        ElMessage.error("请先登录")
-        // Have problems here
+        ElMessage.error("登录已过期，请重新登录")
+        const tokenStore = useTokenStore();
+        tokenStore.removeToken()
         router.push('/login')
+      } else if (error.response.status === 403) {
+        ElMessage.error("没有权限访问该资源")
       } else {
         ElMessage.error('服务异常')
       }

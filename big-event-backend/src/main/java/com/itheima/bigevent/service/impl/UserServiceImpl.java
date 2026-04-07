@@ -4,18 +4,20 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.itheima.bigevent.mapper.UserMapper;
 import com.itheima.bigevent.pojo.User;
 import com.itheima.bigevent.service.UserService;
-import com.itheima.bigevent.utils.Md5Util;
-import com.itheima.bigevent.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public User findByUsername(final String username) {
@@ -26,10 +28,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void register(final String username, final String password) {
-        final String md5String = Md5Util.getMD5String(password);
+        // 使用 BCrypt 加密密码
+        final String encodedPassword = passwordEncoder.encode(password);
         User user = new User();
         user.setUsername(username);
-        user.setPassword(md5String);
+        user.setPassword(encodedPassword);
         userMapper.insert(user);
     }
 
@@ -40,22 +43,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateAvatar(final String url) {
-        final Map<String, Object> map = ThreadLocalUtil.get();
-        final Integer id = (Integer) map.get("id");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User currentUser = findByUsername(username);
+        
         User user = new User();
-        user.setId(id);
+        user.setId(currentUser.getId());
         user.setUserPic(url);
         userMapper.updateById(user);
     }
 
     @Override
     public void updatePwd(final String newPwd) {
-        final String md5String = Md5Util.getMD5String(newPwd);
-        final Map<String, Object> map = ThreadLocalUtil.get();
-        final Integer id = (Integer) map.get("id");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User currentUser = findByUsername(username);
+        
+        // 使用 BCrypt 加密新密码
+        final String encodedPassword = passwordEncoder.encode(newPwd);
         User user = new User();
-        user.setId(id);
-        user.setPassword(md5String);
+        user.setId(currentUser.getId());
+        user.setPassword(encodedPassword);
         userMapper.updateById(user);
     }
 }

@@ -6,11 +6,11 @@ import com.itheima.bigevent.mapper.ArticleMapper;
 import com.itheima.bigevent.pojo.Article;
 import com.itheima.bigevent.pojo.PageBean;
 import com.itheima.bigevent.service.ArticleService;
-import com.itheima.bigevent.utils.ThreadLocalUtil;
+import com.itheima.bigevent.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -18,19 +18,24 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private ArticleMapper articleMapper;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public void add(final Article article) {
-        // Add attributes
-        final Map<String, Object> map = ThreadLocalUtil.get();
-        final Integer id = (Integer) map.get("id");
-        article.setCreateUser(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        com.itheima.bigevent.pojo.User currentUser = userService.findByUsername(username);
+        article.setCreateUser(currentUser.getId());
         articleMapper.insert(article);
     }
 
     @Override
     public PageBean<Article> list(final Integer pageNum, final Integer pageSize, final Integer categoryId, final String state) {
-        final Map<String, Object> map = ThreadLocalUtil.get();
-        final Integer id = (Integer) map.get("id");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        com.itheima.bigevent.pojo.User currentUser = userService.findByUsername(username);
+        final Integer id = currentUser.getId();
         
         // 创建分页对象
         Page<Article> page = new Page<>(pageNum, pageSize);

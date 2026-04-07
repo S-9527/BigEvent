@@ -12,3 +12,6 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+jwt:
+  secret: itheima
+  expiration: 43200000
