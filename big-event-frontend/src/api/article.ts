@@ -20,8 +20,8 @@ export const articleCategoryDeleteService = (id: number): Promise<Result> => {
 export interface ArticleListParams {
   pageNum: number
   pageSize: number
-  categoryId?: number
-  state?: string
+  categoryId?: number | null
+  state?: string | null
 }
 
 export const articleListService = (params: ArticleListParams): Promise<Result<PageBean<Article>>> => {

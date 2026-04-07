@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Plus, Upload } from '@element-plus/icons-vue'
 import { ref } from 'vue'
-import type { UploadResult } from 'element-plus'
 import { useUserInfoStore } from "@/stores/userInfo";
 import { useTokenStore } from "@/stores/token";
 import { ElMessage } from "element-plus";
@@ -12,10 +11,10 @@ const uploadRef = ref<InstanceType<typeof import('element-plus')['ElUpload']>>()
 const userInfoStore = useUserInfoStore();
 
 //用户头像地址
-const imgUrl = ref<string>(userInfoStore.userInfo.userPic)
+const imgUrl = ref<string>(userInfoStore.userInfo.userPic || '')
 
 const tokenStore = useTokenStore();
-const uploadSuccess = (result: UploadResult) => {
+const uploadSuccess = (result: any) => {
   imgUrl.value = result.data;
   ElMessage.success("图片上传成功")
 }
@@ -25,8 +24,13 @@ const updateAvatar = async () => {
   ElMessage.success("修改成功")
 
   userInfoStore.setUserInfo({
-    ...userInfoStore.userInfo,
-    userPic: imgUrl.value
+    id: userInfoStore.userInfo.id || 0,
+    username: userInfoStore.userInfo.username || '',
+    nickname: userInfoStore.userInfo.nickname || '',
+    email: userInfoStore.userInfo.email || '',
+    userPic: imgUrl.value,
+    createTime: userInfoStore.userInfo.createTime || '',
+    updateTime: userInfoStore.userInfo.updateTime || ''
   })
 }
 </script>
@@ -54,7 +58,7 @@ const updateAvatar = async () => {
           <el-image v-else src="avatar" width="278"/>
         </el-upload>
         <br/>
-        <el-button type="primary" :icon="Plus" size="large" @click="uploadRef.$el.querySelector('input').click()">
+        <el-button type="primary" :icon="Plus" size="large" @click="uploadRef?.$el.querySelector('input').click()">
           选择图片
         </el-button>
         <el-button type="success" :icon="Upload" size="large" @click="updateAvatar">

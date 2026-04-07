@@ -29,8 +29,12 @@ const router = useRouter()
 const tokenStore = useTokenStore()
 
 const handleCommand = async (command: string) => {
-  if (command === 'logout') {
-    ElMessageBox.confirm(
+  if (command !== 'logout') {
+    router.push('/user/' + command)
+    return
+  }
+
+  ElMessageBox.confirm(
       '你确认要退出吗？',
       '温馨提示',
       {
@@ -38,16 +42,13 @@ const handleCommand = async (command: string) => {
         cancelButtonText: '取消',
         type: 'warning'
       }
-    ).then(async () => {
-      // clear data in pinia
-      userInfoStore.removeUserInfo()
-      tokenStore.removeToken()
-      ElMessage.success('退出成功')
-      await router.push('/login')
-    })
-  } else {
-    router.push('/user/' + command)
-  }
+  ).then(async () => {
+    // clear data in pinia
+    userInfoStore.removeUserInfo()
+    tokenStore.removeToken()
+    ElMessage.success('退出成功')
+    await router.push('/login')
+  })
 }
 </script>
 

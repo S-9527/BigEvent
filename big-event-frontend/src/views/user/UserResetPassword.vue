@@ -26,7 +26,7 @@ const updatePwdData = async () => {
   }
 }
 
-const checkRePassword: FormItemRule['validator'] = (rule, value, callback) => {
+const checkRePassword: FormItemRule['validator'] = (_rule, value, callback) => {
   if (value === '') {
     callback(new Error('请再次确认密码'))
   } else if (value !== pwdData.value.new_pwd) {

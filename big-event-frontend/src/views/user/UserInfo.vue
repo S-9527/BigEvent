@@ -38,7 +38,12 @@ const rules = ref<FormRules>({
 const updateUserInfo = () => {
   userInfoUpdateService(userInfo.value);
   ElMessage.success('修改成功')
-  userInfoStore.setUserInfo(userInfo.value)
+  userInfoStore.setUserInfo({
+    ...userInfo.value,
+    id: userInfo.value.id || 0,
+    createTime: userInfo.value.createTime || '',
+    updateTime: userInfo.value.updateTime || ''
+  } as any)
 }
 </script>
 <template>

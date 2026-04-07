@@ -2,7 +2,6 @@
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 
 import { ref } from 'vue'
-import type { UploadResult } from 'element-plus'
 import {
   articleAddService,
   articleCategoryListService,
@@ -14,6 +13,7 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { useTokenStore } from "@/stores/token";
 import { ElMessage, ElMessageBox } from "element-plus";
+import type { Article } from '@/types'
 
 interface Category {
   id: number;
@@ -23,15 +23,7 @@ interface Category {
   updateTime: string;
 }
 
-interface Article {
-  id?: number;
-  title: string;
-  content: string;
-  coverImg: string;
-  state: string;
-  categoryId: number | string;
-  createTime?: string;
-  updateTime?: string;
+interface ArticleWithCategory extends Article {
   categoryName?: string;
 }
 
@@ -45,7 +37,7 @@ const categoryId = ref<number | string>('')
 const state = ref<string>('')
 
 //文章列表数据模型
-const articles = ref<Article[]>([])
+const articles = ref<ArticleWithCategory[]>([])
 
 //分页条数据模型
 const pageNum = ref(1)//当前页
@@ -73,8 +65,7 @@ const articleList = async () => {
   const params = {
     pageNum: pageNum.value,
     pageSize: pageSize.value,
-    // 如果为空字符串，可以这样写
-    categoryId: categoryId.value ? categoryId.value : null,
+    categoryId: categoryId.value ? Number(categoryId.value) : null,
     state: state.value ? state.value : null
   }
   const result = await articleListService(params);
@@ -96,22 +87,22 @@ articleList()
 const visibleDrawer = ref(false)
 const drawerTitle = ref<string>('')
 //添加表单数据模型
-const articleModel = ref<Article>({
+const articleModel = ref<Partial<Article>>({
   title: '',
-  categoryId: '',
+  categoryId: 0,
   coverImg: '',
   content: '',
-  state: ''
+  state: '草稿'
 })
 
 const tokenStore = useTokenStore();
-const uploadSuccess = (result: UploadResult) => {
+const uploadSuccess = (result: any) => {
   articleModel.value.coverImg = result.data
 }
 
-const addArticle = async (clickState: string) => {
+const addArticle = async (clickState: '已发布' | '草稿') => {
   articleModel.value.state = clickState
-  await articleAddService(articleModel.value);
+  await articleAddService(articleModel.value as Omit<Article, 'id' | 'createTime' | 'updateTime' | 'createUser'>);
   ElMessage.success('添加成功')
   visibleDrawer.value = false
   await articleList()
@@ -119,7 +110,7 @@ const addArticle = async (clickState: string) => {
 
 
 // 修改与删除
-const showEditDialog = (row: Article, title: string) => {
+const showEditDialog = (row: ArticleWithCategory, title: string) => {
   visibleDrawer.value = true
   drawerTitle.value = title
   articleModel.value = {
@@ -135,23 +126,23 @@ const showAddDialog = (title: string) => {
 const clearData = () => {
   articleModel.value = {
     title: '',
-    categoryId: '',
+    categoryId: 0,
     coverImg: '',
     content: '',
-    state: ''
+    state: '草稿'
   }
 }
 
-const updateArticle = async (clickState: string) => {
+const updateArticle = async (clickState: '已发布' | '草稿') => {
   articleModel.value.state = clickState
-  await articleUpdateService(articleModel.value);
+  await articleUpdateService(articleModel.value as Article);
   ElMessage.success("添加成功")
   visibleDrawer.value = false
   await articleList()
 }
 
 
-const deleteArticle = (row: Article) => {
+const deleteArticle = (row: ArticleWithCategory) => {
   ElMessageBox.confirm(
       '你确认要删除该文章信息吗？',
       '温馨提示',

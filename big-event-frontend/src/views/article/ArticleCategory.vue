@@ -9,14 +9,7 @@ import {
   articleCategoryUpdateService
 } from "@/api/article";
 import { ElMessage, ElMessageBox } from "element-plus";
-
-interface Category {
-  id?: number;
-  categoryName: string;
-  categoryAlias: string;
-  createTime?: string;
-  updateTime?: string;
-}
+import type { Category } from '@/types'
 
 const categories = ref<Category[]>([])
 
@@ -31,7 +24,7 @@ articleCategoryList()
 const dialogVisible = ref(false)
 
 //添加分类数据模型
-const categoryModel = ref<Category>({
+const categoryModel = ref<Pick<Category, 'categoryName' | 'categoryAlias'> & { id?: number }>({
   categoryName: '',
   categoryAlias: ''
 })
@@ -71,7 +64,7 @@ const showDialog = (row: Category) => {
 const updateCategory = async () => {
   const valid = await form.value?.validate();
   if (valid) {
-    await articleCategoryUpdateService(categoryModel.value);
+    await articleCategoryUpdateService(categoryModel.value as Category);
     ElMessage.success("添加成功")
     await articleCategoryList()
     dialogVisible.value = false
