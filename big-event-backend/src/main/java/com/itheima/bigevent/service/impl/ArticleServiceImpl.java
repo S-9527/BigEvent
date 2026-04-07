@@ -1,8 +1,7 @@
 package com.itheima.bigevent.service.impl;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.bigevent.mapper.ArticleMapper;
 import com.itheima.bigevent.pojo.Article;
 import com.itheima.bigevent.pojo.PageBean;
@@ -11,7 +10,6 @@ import com.itheima.bigevent.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -26,35 +24,40 @@ public class ArticleServiceImpl implements ArticleService {
         final Map<String, Object> map = ThreadLocalUtil.get();
         final Integer id = (Integer) map.get("id");
         article.setCreateUser(id);
-        articleMapper.add(article);
+        articleMapper.insert(article);
     }
 
     @Override
     public PageBean<Article> list(final Integer pageNum, final Integer pageSize, final Integer categoryId, final String state) {
-        final PageBean<Article> pageBean = new PageBean<>();
-        PageHelper.startPage(pageNum, pageSize);
         final Map<String, Object> map = ThreadLocalUtil.get();
         final Integer id = (Integer) map.get("id");
-        final Page<Article> articleList = (Page<Article>) articleMapper.list(id, categoryId, state);
-        pageBean.setTotal(articleList.getTotal());
-        pageBean.setItems(articleList.getResult());
+        
+        // 创建分页对象
+        Page<Article> page = new Page<>(pageNum, pageSize);
+        
+        // 执行分页查询
+        IPage<Article> articlePage = articleMapper.selectArticlePage(page, id, categoryId, state);
+        
+        // 封装结果
+        PageBean<Article> pageBean = new PageBean<>();
+        pageBean.setTotal(articlePage.getTotal());
+        pageBean.setItems(articlePage.getRecords());
         return pageBean;
     }
 
 
     @Override
     public Article findById(final Integer id) {
-
-        return articleMapper.findById(id);
+        return articleMapper.selectById(id);
     }
 
     @Override
     public void update(final Article article) {
-        articleMapper.update(article);
+        articleMapper.updateById(article);
     }
 
     @Override
     public void delete(final Integer id) {
-        articleMapper.delete(id);
+        articleMapper.deleteById(id);
     }
 }

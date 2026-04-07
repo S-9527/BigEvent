@@ -3,8 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.itheima.bigevent.mapper.ArticleMapper">
-    <!--动态SQL-->
-    <select id="list" resultType="com.itheima.bigevent.pojo.Article">
+    <!--动态SQL分页查询-->
+    <select id="selectArticlePage" resultType="com.itheima.bigevent.pojo.Article">
         select * from article
         <where>
             <if test="categoryId!=null">
@@ -13,7 +13,6 @@
             <if test="state!=null">
                 and state=#{state}
             </if>
-
             and create_user=#{id}
         </where>
     </select>

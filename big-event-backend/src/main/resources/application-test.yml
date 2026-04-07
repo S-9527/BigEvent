@@ -8,6 +8,6 @@ spring:
     redis:
       host: 192.168.1.98
       port: 6379
-mybatis:
+mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true

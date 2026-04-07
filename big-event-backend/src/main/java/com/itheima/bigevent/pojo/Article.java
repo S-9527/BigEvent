@@ -1,6 +1,8 @@
 package com.itheima.bigevent.pojo;
 
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.itheima.bigevent.anno.State;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -12,8 +14,9 @@ import org.hibernate.validator.constraints.URL;
 import java.time.LocalDateTime;
 
 @Data
+@TableName("article")
 public class Article {
-    @NotNull(groups = {Update.class})
+    @TableId(type = IdType.AUTO)
     private Integer id;//主键ID
 
     @NotEmpty

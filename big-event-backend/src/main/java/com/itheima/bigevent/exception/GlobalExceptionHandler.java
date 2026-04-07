@@ -10,7 +10,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({Exception.class})
     public <T> Result<T> handleException(final Exception exception) {
-        exception.printStackTrace();
         return Result.error(StringUtils.hasLength(exception.getMessage()) ? exception.getMessage() : "操作失败");
     }
 }

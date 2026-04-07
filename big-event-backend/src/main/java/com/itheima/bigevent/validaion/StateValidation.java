@@ -8,9 +8,6 @@ public class StateValidation implements ConstraintValidator<State, String> {
 
     @Override
     public boolean isValid(final String value, final ConstraintValidatorContext constraintValidatorContext) {
-        if (value == null) {
-            return false;
-        }
-        return value.equals("已发布") || value.equals("草稿");
+        return value != null && (value.equals("已发布") || value.equals("草稿"));
     }
 }

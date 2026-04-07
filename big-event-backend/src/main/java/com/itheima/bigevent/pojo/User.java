@@ -1,18 +1,20 @@
 package com.itheima.bigevent.pojo;
 
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@TableName("user")
 public class User {
-    @NotNull
+    @TableId(type = IdType.AUTO)
     private Integer id;//主键ID
     private String username;//用户名
     @JsonIgnore // let springmvc ignore password when converting object to json

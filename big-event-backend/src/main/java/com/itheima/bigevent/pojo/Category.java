@@ -1,17 +1,20 @@
 package com.itheima.bigevent.pojo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.groups.Default;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@TableName("category")
 public class Category {
 
-    @NotNull(groups = {Update.class})
+    @TableId(type = IdType.AUTO)
     private Integer id;//主键ID
 
     @NotEmpty

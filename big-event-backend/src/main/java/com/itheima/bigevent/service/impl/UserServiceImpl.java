@@ -1,5 +1,6 @@
 package com.itheima.bigevent.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.itheima.bigevent.mapper.UserMapper;
 import com.itheima.bigevent.pojo.User;
 import com.itheima.bigevent.service.UserService;
@@ -18,25 +19,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsername(final String username) {
-        return userMapper.findByUsername(username);
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getUsername, username);
+        return userMapper.selectOne(wrapper);
     }
 
     @Override
     public void register(final String username, final String password) {
         final String md5String = Md5Util.getMD5String(password);
-        userMapper.add(username, md5String);
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(md5String);
+        userMapper.insert(user);
     }
 
     @Override
     public void update(final User user) {
-        userMapper.update(user);
+        userMapper.updateById(user);
     }
 
     @Override
     public void updateAvatar(final String url) {
         final Map<String, Object> map = ThreadLocalUtil.get();
         final Integer id = (Integer) map.get("id");
-        userMapper.updateAvatar(url, id);
+        User user = new User();
+        user.setId(id);
+        user.setUserPic(url);
+        userMapper.updateById(user);
     }
 
     @Override
@@ -44,6 +53,9 @@ public class UserServiceImpl implements UserService {
         final String md5String = Md5Util.getMD5String(newPwd);
         final Map<String, Object> map = ThreadLocalUtil.get();
         final Integer id = (Integer) map.get("id");
-        userMapper.updatePwd(md5String, id);
+        User user = new User();
+        user.setId(id);
+        user.setPassword(md5String);
+        userMapper.updateById(user);
     }
 }
