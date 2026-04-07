@@ -1,4 +1,0 @@
-server:
-  port: 9191
-  servlet:
-    context-path: /start2
