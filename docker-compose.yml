@@ -34,7 +34,7 @@ services:
        timeout: 5s
        retries: 5
   backend:
-    build: ./backend          # 使用 Dockerfile 构建
+    build: ./big-event-backend          # 使用 Dockerfile 构建
     container_name: springboot-app
     restart: always
     ports:
@@ -46,7 +46,7 @@ services:
       - app-network
 
   frontend:
-    build: ./frontend
+    build: ./big-event-frontend
     container_name: vue-app
     restart: always
     ports:
