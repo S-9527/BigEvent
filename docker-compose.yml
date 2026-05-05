@@ -59,3 +59,7 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
