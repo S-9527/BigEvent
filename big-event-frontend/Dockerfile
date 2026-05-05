@@ -18,6 +18,6 @@ RUN pnpm run build
 FROM nginx:stable-alpine
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 # 如果有自定义 nginx 配置，取消注释并确保文件存在
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
