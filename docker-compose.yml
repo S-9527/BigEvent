@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: myapp
+      MYSQL_USER: root
+      MYSQL_PASSWORD: disixueyuan
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-cache
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+       - app-network
+    healthcheck:
+       test: [ "CMD", "redis-cli", "ping" ]
+       interval: 10s
+       timeout: 5s
+       retries: 5
+  backend:
+    build: ./backend          # 使用 Dockerfile 构建
+    container_name: springboot-app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    # 如果有数据库，添加 depends_on 和网络
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: vue-app
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
